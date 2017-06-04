@@ -4,6 +4,7 @@ import bodyParser = require('body-parser')
 import {HttpError} from './errors/http-error'
 import {rootRoutes} from './routes/index'
 import {container} from './ioc'
+import {ConfigService} from './services/config/config.service'
 
 const nodeCleanup = require('node-cleanup')
 const {ChromeLauncher} = require('lighthouse/lighthouse-cli/chrome-launcher')
@@ -33,8 +34,9 @@ app.use(function (err: any, req: express.Request, res: express.Response, next: e
     res.send(err.message)
 })
 
-launchChrome(true).then((launcher: any) => {
-    console.log('Launched chrome!')
+let configService = container.get<ConfigService>(ConfigService)
+launchChrome(configService.config.chrome.headless).then((launcher: any) => {
+    console.log('Launched chrome! Headless: ' + configService.config.chrome.headless)
 })
 
 nodeCleanup((exitCode: any, signal: any) => {

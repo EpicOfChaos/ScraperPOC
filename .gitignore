@@ -3,3 +3,5 @@ dist-server
 .idea
 npm-debug.log
 .env
+data/**
+!username_bank.json.example

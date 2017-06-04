@@ -1,3 +1,6 @@
 export interface EnvConfig {
-    dataDir: string
+    dataDir: string,
+    chrome: {
+        headless: boolean
+    }
 }

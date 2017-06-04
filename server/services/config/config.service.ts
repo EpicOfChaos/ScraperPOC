@@ -12,7 +12,10 @@ export class ConfigService {
         })
 
         this._config = {
-            dataDir: process.env.DATA_DIR
+            dataDir: process.env.DATA_DIR,
+            chrome: {
+                headless: process.env.CHROME_HEADLESS === 'true'
+            }
         }
     }
 

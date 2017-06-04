@@ -29,6 +29,6 @@ export class BankInfoRepository {
     }
 
     private getFileName(user: string, bank: Bank) {
-        return `${this.configService.config.dataDir}/${user}_${bank}.json`;
+        return `${this.configService.config.dataDir}${user}_${bank}.json`;
     }
 }
