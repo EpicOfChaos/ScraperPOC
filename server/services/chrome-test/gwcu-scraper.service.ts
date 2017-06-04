@@ -1,6 +1,6 @@
 import {injectable} from 'inversify'
 import {ChromePoolService} from '../chrome/chrome-pool.service'
-import {BankInfo} from '../../repositories/bank-info/bank-info'
+import {BankInfo, Cookie} from '../../repositories/bank-info/bank-info'
 import {Chrome} from '../chrome/chrome'
 
 @injectable()
@@ -45,7 +45,7 @@ export class GWCUScraperService {
             console.log('Successfully downloaded transactions.')
 
             let cookies = await chromeInstance.getCookies()
-            let validCookies = cookies.filter((cookie) => {
+            let validCookies = cookies.filter((cookie:Cookie) => {
                 return cookie.name !== 'Jwaala.Site.User'
             })
             return {

@@ -26,7 +26,7 @@ export class ChromePoolService {
         console.log('Target Response' + JSON.stringify(targetResponse))
 
         let targets = await CDP.List()
-        let target = targets.filter((target) => {
+        let target = targets.filter((target:any) => {
             return target.id === targetResponse.targetId
         })[0]
         console.log('Found Target: ' + JSON.stringify(target))
