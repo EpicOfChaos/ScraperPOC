@@ -21,6 +21,7 @@ export class ProcessBankCompletePublisher {
     }
 
     public publishMessage(msg: any){
+        console.log('Publishing message: ' + JSON.stringify(msg))
         this.exchange.publish('', msg, null, (result: any) => {
             console.log('Message Publsihed. Result: ' + result)
         })
