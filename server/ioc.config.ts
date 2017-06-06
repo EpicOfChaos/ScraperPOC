@@ -7,6 +7,8 @@ import {ChromePoolService} from "./services/chrome/chrome-pool.service";
 import {GWCUScraperService} from "./services/chrome-test/gwcu-scraper.service";
 import {ConfigService} from "./services/config/config.service";
 import {BankInfoRepository} from "./repositories/bank-info/bank-info.repository";
+import {ProcessBankCompletePublisher} from './rabbit/process-bank-complete.publisher'
+import {ProcessBankListener} from './rabbit/process-bank.listener'
 
 let services: any[] = [
     AskScraperService,
@@ -20,4 +22,12 @@ let services: any[] = [
     GWCUScraperService
 ]
 
-export const DIList = [...services]
+let publishers: any[] = [
+    ProcessBankCompletePublisher
+]
+
+let listeners: any[] = [
+    ProcessBankListener
+]
+
+export const DIList = [...services, ...publishers, ...listeners]

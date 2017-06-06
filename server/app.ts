@@ -5,6 +5,8 @@ import {HttpError} from './errors/http-error'
 import {rootRoutes} from './routes/index'
 import {container} from './ioc'
 import {ConfigService} from './services/config/config.service'
+import {ProcessBankCompletePublisher} from './rabbit/process-bank-complete.publisher'
+import {ProcessBankListener} from './rabbit/process-bank.listener'
 
 const nodeCleanup = require('node-cleanup')
 const {ChromeLauncher} = require('lighthouse/lighthouse-cli/chrome-launcher')
@@ -38,6 +40,12 @@ let configService = container.get<ConfigService>(ConfigService)
 launchChrome(configService.config.chrome.headless).then((launcher: any) => {
     console.log('Launched chrome! Headless: ' + configService.config.chrome.headless)
 })
+
+let processBankCompletePublisher = container.get<ProcessBankCompletePublisher>(ProcessBankCompletePublisher)
+processBankCompletePublisher.init()
+
+let processBankListener = container.get<ProcessBankListener>(ProcessBankListener)
+processBankListener.init()
 
 nodeCleanup((exitCode: any, signal: any) => {
     if (signal) {

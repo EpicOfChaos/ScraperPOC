@@ -46,3 +46,15 @@ Execute url http://localhost:3000/process/BING in a browser
 
 ### Ask.com
 Execute url http://localhost:3000/process/ASK in a browser
+
+# Run RabbitMQ via Docker
+## Download Docker
+1. You can download docker for mac os at https://docs.docker.com/docker-for-mac/install/#download-docker-for-mac
+
+2. Start Docker
+## Download and run image
+1. ```docker pull rabbitmq:latest```
+
+2. ```docker run -d --hostname my-rabbit --name some-rabbit -p 8080:15672 -p 5672:5672 rabbitmq:3-management```
+
+3. You should be able to access management console via localhost:8080
