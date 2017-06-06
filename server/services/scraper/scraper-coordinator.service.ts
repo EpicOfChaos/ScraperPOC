@@ -7,6 +7,7 @@ import {GWCUScraperService} from "../chrome-test/gwcu-scraper.service";
 import {Bank} from "../../repositories/bank-info/bank.enum";
 import {BankInfoRepository} from "../../repositories/bank-info/bank-info.repository";
 import {ScraperResponseStatus} from './scraper-response'
+import {ProcessBankCompletePublisher} from '../../rabbit/process-bank-complete.publisher'
 
 @injectable()
 export class ScraperCoordinatorService {
@@ -15,7 +16,8 @@ export class ScraperCoordinatorService {
                 private askScraper: AskScraperService,
                 private chromiumTest: ChromiumTest,
                 private gwcuScraper: GWCUScraperService,
-                private bankInfoRepo: BankInfoRepository
+                private bankInfoRepo: BankInfoRepository,
+                private processBankCompletePublisher: ProcessBankCompletePublisher
     ) {}
 
     async process(type: string) {
@@ -40,6 +42,7 @@ export class ScraperCoordinatorService {
 
         let result =  await this.gwcuScraper.process(bankInfo)
         if(result.status === ScraperResponseStatus.Complete){
+            await this.processBankCompletePublisher.publishMessage(result)
             await this.bankInfoRepo.updateCookies(user, bank, result.cookies)
         }
 
@@ -52,8 +55,9 @@ export class ScraperCoordinatorService {
             throw new Error(`No bank info for user ${user} and bank ${bank}`)
         }
 
-        let result =  await this.gwcuScraper.processMFA(bankInfo, targetId, answer)
+        let result:any =  await this.gwcuScraper.processMFA(bankInfo, targetId, answer)
         if(result.status === ScraperResponseStatus.Complete && result.cookies){
+            await this.processBankCompletePublisher.publishMessage(result)
             await this.bankInfoRepo.updateCookies(user, bank, result.cookies)
         }
 
