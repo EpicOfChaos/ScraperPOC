@@ -8,7 +8,7 @@ rootRoutes.get('/health', function (req: express.Request, res: express.Response,
     res.send('OK')
 })
 
-rootRoutes.get('/search/:type', async function (req: express.Request, res: express.Response, next: express.NextFunction) {
+rootRoutes.post('/search/:type', async function (req: express.Request, res: express.Response, next: express.NextFunction) {
     console.log('Req to process: ' + req.params.type)
     try {
         let testService = container.get<ScraperCoordinatorService>(ScraperCoordinatorService)
@@ -19,11 +19,20 @@ rootRoutes.get('/search/:type', async function (req: express.Request, res: expre
     }
 })
 
-rootRoutes.get('/process/:bank/:user', async function (req: express.Request, res: express.Response, next: express.NextFunction) {
+rootRoutes.post('/process/bank', async function (req: express.Request, res: express.Response, next: express.NextFunction) {
     try {
-        let bank = req.params.bank
         let testService = container.get<ScraperCoordinatorService>(ScraperCoordinatorService)
-        let data = await testService.processBank(bank, req.params.user)
+        let data = await testService.processBank(req.body.bank, req.body.username)
+        res.send({data})
+    }catch(err){
+        next(err)
+    }
+})
+
+rootRoutes.post('/process/bank/MFA', async function (req: express.Request, res: express.Response, next: express.NextFunction) {
+    try {
+        let testService = container.get<ScraperCoordinatorService>(ScraperCoordinatorService)
+        let data = await testService.processBankMFA(req.body.bank, req.body.username, req.body.targetId, req.body.answer)
         res.send({data})
     }catch(err){
         next(err)

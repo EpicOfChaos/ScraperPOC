@@ -6,6 +6,7 @@ import {ChromiumTest} from "../chrome-test/chromium-test";
 import {GWCUScraperService} from "../chrome-test/gwcu-scraper.service";
 import {Bank} from "../../repositories/bank-info/bank.enum";
 import {BankInfoRepository} from "../../repositories/bank-info/bank-info.repository";
+import {ScraperResponseStatus} from './scraper-response'
 
 @injectable()
 export class ScraperCoordinatorService {
@@ -38,7 +39,21 @@ export class ScraperCoordinatorService {
         }
 
         let result =  await this.gwcuScraper.process(bankInfo)
-        if(result.success){
+        if(result.status === ScraperResponseStatus.Complete){
+            await this.bankInfoRepo.updateCookies(user, bank, result.cookies)
+        }
+
+        return result
+    }
+
+    async processBankMFA(bank: Bank, user: string, targetId: string, answer: string){
+        let bankInfo = await this.bankInfoRepo.getBankInfo(user, bank)
+        if(!bankInfo){
+            throw new Error(`No bank info for user ${user} and bank ${bank}`)
+        }
+
+        let result =  await this.gwcuScraper.processMFA(bankInfo, targetId, answer)
+        if(result.status === ScraperResponseStatus.Complete && result.cookies){
             await this.bankInfoRepo.updateCookies(user, bank, result.cookies)
         }
 

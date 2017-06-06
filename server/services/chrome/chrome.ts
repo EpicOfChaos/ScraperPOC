@@ -10,16 +10,18 @@ export class Chrome {
     private _Runtime: any
     private _Input: any
     private _Network: any
+    private _Target: any
 
     constructor(private targetId: string,
                 private client: any,
                 private CDP: any,
                 private dataDir: string) {
-        let {Page, Runtime, Input, Network} = client
+        let {Page, Runtime, Input, Network, Target} = client
         this._Page = Page
         this._Runtime = Runtime
         this._Input = Input
         this._Network = Network
+        this._Target = Target
     }
 
     get Page() {
@@ -36,6 +38,27 @@ export class Chrome {
 
     get Network() {
         return this._Network
+    }
+
+    get Target() {
+        return this._Target
+    }
+
+    get target() {
+        return this.targetId
+    }
+
+    async attach(){
+        await this._Target.attachToTarget({
+            targetId: this.targetId
+        })
+    }
+
+    async detach(){
+        console.log('Detaching fromm target: ' + this.targetId)
+        await this._Target.detachFromTarget({
+            targetId: this.targetId
+        })
     }
 
     async clearCookies(){
@@ -130,6 +153,28 @@ export class Chrome {
 
         await this._Input.dispatchMouseEvent(mouseDownEvent)
         await this._Input.dispatchMouseEvent(mouseUpEvent)
+    }
+
+    async innerText(selector: string){
+        return await this.executeJQuery(`$('${selector}')[0].innerText`)
+    }
+
+    async waitForOneElement(selectors:string[], maxWait:number= 5000, interval: number = 100){
+        let waitDuration = 0
+        do {
+            for(let selector of selectors){
+                let response = await this.executeJQuery(`$('${selector}').length`)
+                if(response > 0){
+                    return selector
+                }
+            }
+
+            await delay(interval)
+            waitDuration += interval
+        } while(waitDuration < maxWait)
+        console.log('Timeout waiting for elements: ' + selectors)
+
+        throw new Error('Timeout waiting for elements: ' + selectors)
     }
 
     async waitForElement(selector: string, maxWait:number = 5000, interval: number = 100){
