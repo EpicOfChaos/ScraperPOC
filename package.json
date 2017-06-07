@@ -13,6 +13,7 @@
     "test-watch": "npm run test -- -w"
   },
   "dependencies": {
+    "amqp": "^0.2.6",
     "body-parser": "~1.16.0",
     "chrome-remote-interface": "^0.22.0",
     "cookie-parser": "~1.4.3",
@@ -28,6 +29,7 @@
     "timeout-as-promise": "^1.0.0"
   },
   "devDependencies": {
+    "@types/amqp": "^0.2.0",
     "@types/body-parser": "^1.16.1",
     "@types/chai": "^3.4.35",
     "@types/chai-as-promised": "0.0.30",

@@ -15,7 +15,8 @@ export class Chrome {
     constructor(private targetId: string,
                 private client: any,
                 private CDP: any,
-                private dataDir: string) {
+                private dataDir: string,
+                private headless: boolean) {
         let {Page, Runtime, Input, Network, Target} = client
         this._Page = Page
         this._Runtime = Runtime
@@ -56,9 +57,10 @@ export class Chrome {
 
     async detach(){
         console.log('Detaching fromm target: ' + this.targetId)
-        await this._Target.detachFromTarget({
-            targetId: this.targetId
-        })
+        // await this._Target.detachFromTarget({
+        //     targetId: this.targetId
+        // })
+        this.client.close()
     }
 
     async clearCookies(){
@@ -159,7 +161,7 @@ export class Chrome {
         return await this.executeJQuery(`$('${selector}')[0].innerText`)
     }
 
-    async waitForOneElement(selectors:string[], maxWait:number= 5000, interval: number = 100){
+    async waitForOneElement(selectors:string[], maxWait:number= 5000, interval: number = 200){
         let waitDuration = 0
         do {
             for(let selector of selectors){
@@ -177,7 +179,7 @@ export class Chrome {
         throw new Error('Timeout waiting for elements: ' + selectors)
     }
 
-    async waitForElement(selector: string, maxWait:number = 5000, interval: number = 100){
+    async waitForElement(selector: string, maxWait:number = 20000, interval: number = 100){
         let waitDuration = 0
         do {
             let response = await this.executeJQuery(`$('${selector}').length`)
@@ -202,6 +204,10 @@ export class Chrome {
     }
 
     async saveScreenshot(){
+        if(!this.headless){
+            console.log('Cannot make PDF, not in headless mode.')
+            return
+        }
         let pdfResponse = await this.Page.printToPDF()
         let pdfFileName = `${this.dataDir}timeout_${(new Date).getTime()}.pdf`
         await fs.writeFile(pdfFileName, pdfResponse.data, {
