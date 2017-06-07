@@ -20,7 +20,7 @@
     "express": "~4.14.1",
     "fs-extra": "^3.0.1",
     "inversify": "^3.3.0",
-    "lighthouse": "^2.0.0",
+    "lighthouse": "2.0.0",
     "lodash": "^4.17.4",
     "node-cleanup": "^2.1.2",
     "node-horseman": "^3.2.0",
