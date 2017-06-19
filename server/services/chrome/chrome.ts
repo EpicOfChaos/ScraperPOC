@@ -195,6 +195,10 @@ export class Chrome {
         throw new Error('Timeout waiting for element: ' + selector)
     }
 
+    async getElementValue(selector: string){
+        return await this.executeJQuery(`$('${selector}')[0].value`)
+    }
+
     async delay(interval: number){
         await delay(interval)
     }

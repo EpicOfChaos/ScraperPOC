@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "scripts": {
     "start": "node dist-server/bin/index.js",
-    "start-dev": "nodemon --delay 1 dist-server/bin/index.js",
+    "start-dev": "nodemon --ignore 'data/*.json' --delay 1 dist-server/bin/index.js",
     "start-itellij-debug": "node $NODE_DEBUG_OPTION dist-server/bin/index.js",
     "build": "npm run clean && tsc -p tsconfig.json",
     "clean": "rimraf dist-server/**",

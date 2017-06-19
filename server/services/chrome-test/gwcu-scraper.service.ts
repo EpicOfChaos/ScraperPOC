@@ -112,6 +112,7 @@ export class GWCUScraperService {
         await chromeInstance.typeKeyCode('#String1Field', Chrome.TAB_KEY)
         await chromeInstance.delay(200)
         await chromeInstance.click('#SubmitDownload', 3)
+        await chromeInstance.delay(3000)
         console.log('Successfully downloaded transactions.')
     }
 

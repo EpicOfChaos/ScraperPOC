@@ -1,51 +1,60 @@
 import express = require('express')
 import {container} from '../ioc'
 import {ScraperCoordinatorService} from '../services/scraper/scraper-coordinator.service'
-import {Bank} from "../repositories/bank-info/bank.enum";
 import {ProcessBankCompletePublisher} from '../rabbit/process-bank-complete.publisher'
 export const rootRoutes = express.Router()
 
-rootRoutes.get('/health', function (req: express.Request, res: express.Response, next: express.NextFunction) {
-    res.send('OK')
-})
+rootRoutes.get('/health', healthCheck)
 
-rootRoutes.post('/search/:type', async function (req: express.Request, res: express.Response, next: express.NextFunction) {
+rootRoutes.post('/search/:type', searchPoc)
+
+rootRoutes.post('/process/bank', processBank)
+
+rootRoutes.post('/process/bank/MFA', processBankMFA)
+
+rootRoutes.post('/publish/test', publishTest)
+
+//Get reference to the DI services, only do this once for performance reasons, don't do it inside each function.
+const scraperCoordinatorService = container.get<ScraperCoordinatorService>(ScraperCoordinatorService)
+const processBankCompletePublisher = container.get<ProcessBankCompletePublisher>(ProcessBankCompletePublisher)
+
+function healthCheck (req: express.Request, res: express.Response, next: express.NextFunction) {
+    res.send('OK')
+}
+
+async function searchPoc(req: express.Request, res: express.Response, next: express.NextFunction) {
     console.log('Req to process: ' + req.params.type)
     try {
-        let testService = container.get<ScraperCoordinatorService>(ScraperCoordinatorService)
-        let data = await testService.process(req.params.type)
+        let data = await scraperCoordinatorService.process(req.params.type)
         res.send({data})
     }catch(err){
         next(err)
     }
-})
+}
 
-rootRoutes.post('/process/bank', async function (req: express.Request, res: express.Response, next: express.NextFunction) {
+async function processBank(req: express.Request, res: express.Response, next: express.NextFunction) {
     try {
-        let testService = container.get<ScraperCoordinatorService>(ScraperCoordinatorService)
-        let data = await testService.processBank(req.body.bank, req.body.username)
+        let data = await scraperCoordinatorService.processBank(req.body.bank, req.body.username)
         res.send({data})
     }catch(err){
         next(err)
     }
-})
+}
 
-rootRoutes.post('/process/bank/MFA', async function (req: express.Request, res: express.Response, next: express.NextFunction) {
+async function processBankMFA(req: express.Request, res: express.Response, next: express.NextFunction) {
     try {
-        let testService = container.get<ScraperCoordinatorService>(ScraperCoordinatorService)
-        let data = await testService.processBankMFA(req.body.bank, req.body.username, req.body.targetId, req.body.answer)
+        let data = await scraperCoordinatorService.processBankMFA(req.body.bank, req.body.username, req.body.targetId, req.body.answer)
         res.send({data})
     }catch(err){
         next(err)
     }
-})
+}
 
-rootRoutes.post('/publish/test', async function (req: express.Request, res: express.Response, next: express.NextFunction) {
+async function publishTest(req: express.Request, res: express.Response, next: express.NextFunction) {
     try {
-        let testService = container.get<ProcessBankCompletePublisher>(ProcessBankCompletePublisher)
-        let data = await testService.publishMessage(req.body)
+        let data = await processBankCompletePublisher.publishMessage(req.body)
         res.send({data})
     }catch(err){
         next(err)
     }
-})
+}
